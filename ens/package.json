@@ -1,0 +1,29 @@
+{
+  "name": "ebakus-contracts-ens",
+  "version": "1.0.0",
+  "description": "ENS Ebakus contract",
+  "scripts": {
+    "compile": "truffle compile",
+    "migrate": "truffle migrate",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ebakus/ebakus-contracts/ens"
+  },
+  "keywords": [
+    "solidity",
+    "ebakus",
+    "contracts",
+    "db"
+  ],
+  "author": "Ebakus AG <hello@ebakus.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ebakus/ebakus-contracts/issues"
+  },
+  "homepage": "https://www.ebakus.com",
+  "devDependencies": {
+    "truffle": "^5.1.17"
+  }
+}
