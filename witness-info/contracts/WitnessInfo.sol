@@ -9,7 +9,6 @@ contract WitnessInfo {
    * @notice Set info for witness
    * @param account The witness account address
    * @param info A JSON string with info about the witness
-   * @return iter Select iterator that has to be passed in EbakusDB.next(...)
    */
   function set(address account, string calldata info) external {
     require(msg.sender == account, "Only owner of address can store witness info.");
@@ -25,7 +24,7 @@ contract WitnessInfo {
    * @param account The witness account address
    * @return info A JSON string with info about the witness
    */
-  function get(address account) external view returns (string memory Info) {
+  function get(address account) external view returns (string memory info) {
     return _abis[account];
   }
 
