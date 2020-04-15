@@ -13,7 +13,7 @@ contract ENS {
 
   address private _owner;
   uint256 private _registrationAmount = 0.1 ether;
-  uint256 private _registrationPeriod = 24 weeks;
+  uint256 private _registrationPeriod = 365 days;
 
   mapping (bytes32 => address) private _lookupTable;
   mapping (bytes32 => uint256) public _expiryTimes;
