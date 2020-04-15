@@ -2,6 +2,7 @@ pragma solidity >=0.6.0 <0.7.0;
 
 contract ENS {
   event NewOwner(bytes32 indexed label, address owner);
+  event Renew(bytes32 indexed label, address owner);
   event Transfer(bytes32 indexed label, address newOwner);
 
   // struct Record {
@@ -14,8 +15,10 @@ contract ENS {
   address private _owner;
   uint256 private _registrationAmount = 0.1 ether;
   uint256 private _registrationPeriod = 365 days;
+  uint256 private _renewWithinPeriod = 182 days;
 
-  mapping (bytes32 => address) private _lookupTable;
+  mapping (bytes32 => address) private _lookupOwner;
+  mapping (bytes32 => address) private _lookupBuyer;
   mapping (bytes32 => uint256) public _expiryTimes;
 
   modifier onlyOwner() {
@@ -61,10 +64,9 @@ contract ENS {
     require(msg.value >= _registrationAmount, "ENS: Not enough EBK for registering new label");
     require(msg.sender.balance >= _registrationAmount, "ENS: Not enough EBK for registering new label");
 
-    _lookupTable[label] = owner;
+    _lookupOwner[label] = owner;
+    _lookupBuyer[label] = msg.sender;
     _expiryTimes[label] = now + _registrationPeriod;
-
-    // TODO: do we need to keep track of msg.sender?
 
     // return back any excess amount
     if (msg.value > _registrationAmount) {
@@ -74,22 +76,41 @@ contract ENS {
     emit NewOwner(label, owner);
   }
 
+  function renew(bytes32 label, address owner) payable external {
+    require(label.length > 0 && label.length <= 64, "ENS: Label length is not correct");
+    require(owner != address(0), "ENS: Owner is the zero address");
+    require(_expiryTimes[label] <= now + _renewWithinPeriod, "ENS: Renew is allowed 6 months before expiration");
+    require(msg.sender == _lookupOwner[label] || msg.sender == _lookupBuyer[label], "ENS: The label doesn't belong to you");
+    require(msg.value >= _registrationAmount, "ENS: Not enough EBK for renewing the label");
+    require(msg.sender.balance >= _registrationAmount, "ENS: Not enough EBK for renewing the label");
+
+    _expiryTimes[label] = _expiryTimes[label] + _registrationPeriod;
+
+    // return back any excess amount
+    if (msg.value > _registrationAmount) {
+      msg.sender.transfer(msg.value - _registrationAmount);
+    }
+
+    emit Renew(label, owner);
+  }
+
   function transfer(bytes32 label, address newOwner) external {
     require(newOwner != address(0), "ENS: New owner is the zero address");
-    require(_lookupTable[label] != address(0), "ENS: Label doesn't exist");
-    require(_lookupTable[label] != msg.sender, "ENS: Invalid owner for label");
+    require(_lookupOwner[label] != address(0), "ENS: Label doesn't exist");
+    require(msg.sender == _lookupOwner[label] || msg.sender == _lookupBuyer[label], "ENS: The label doesn't belong to you");
     require(_expiryTimes[label] >= now, "ENS: Label is expired");
 
-    _lookupTable[label] = newOwner;
+    _lookupOwner[label] = newOwner;
 
     // TODO: do we want to update the expiry time?
     // TODO: if expired we might want to release the entries in _lookupTable and _expiryTimes
+    // TODO: if expired we might want to release the entries in _lookupOwner and _expiryTimes
 
     emit Transfer(label, newOwner);
   }
 
   function owner(bytes32 label) external view returns (address) {
-    return _lookupTable[label];
+    return _lookupOwner[label];
   }
 
   function expiresAt(bytes32 label) external view returns (uint) {
