@@ -17,19 +17,30 @@ contract ENS {
   uint256 private _registrationPeriod = 365 days;
   uint256 private _renewWithinPeriod = 182 days;
 
+  mapping (address => bool) public _admins;
+
   mapping (bytes32 => address) private _lookupOwner;
   mapping (bytes32 => address) private _lookupBuyer;
   mapping (bytes32 => uint256) public _expiryTimes;
 
+  /**
+   * @dev Modifier that checks if sender is the contracts' owner.
+   */
   modifier onlyOwner() {
     require(msg.sender == _owner, "Only owner can call this function");
     _;
   }
 
+  /**
+   * @dev Modifier that checks if sender is the contracts' owner or an administrator.
+   */
+  modifier onlyOwnerOrAdmin() {
+    require(msg.sender == _owner || _admins[msg.sender], "Sender is neither owner, nor an admin.");
+    _;
+  }
+
   constructor() public {
     _owner = msg.sender;
-
-    // TODO: we might want to allow more admins, instead of only the owner to ste amounts etc
   }
 
   fallback() external {
@@ -37,7 +48,24 @@ contract ENS {
   }
 
   // Admin functions
-  function setRegistrationAmount(uint256 value) external onlyOwner {
+  /**
+   * @dev Set/Unset an admin.
+   *
+   * @param _admin admin address
+   * @param _isAdmin set/unset the admin priviledge
+   */
+  function setAdmin(address _admin, bool _isAdmin) public onlyOwner {
+    _admins[_admin] = _isAdmin;
+  }
+
+  /**
+   * @dev Returns if sender is an admin.
+   */
+  function isAdmin() public view returns (bool) {
+    return _admins[msg.sender];
+  }
+
+  function setRegistrationAmount(uint256 value) external onlyOwnerOrAdmin {
     require(value >= 0 ether, "ENS: Registation amount has to be more than 0 EBK");
     _registrationAmount = value;
   }
@@ -46,7 +74,7 @@ contract ENS {
     return _registrationAmount;
   }
 
-  function setRegistrationPeriod(uint256 period) external onlyOwner {
+  function setRegistrationPeriod(uint256 period) external onlyOwnerOrAdmin {
     require(period >= 1 days, "ENS: Registation period can't be less than a day");
     _registrationPeriod = period;
   }
