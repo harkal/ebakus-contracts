@@ -13,8 +13,8 @@ contract ENS {
 
     mapping(address => bool) public _admins;
 
-    mapping(bytes32 => address) private _lookupOwner;
-    mapping(bytes32 => address) private _lookupBuyer;
+    mapping(bytes32 => address) public _lookupOwner;
+    mapping(bytes32 => address) public _lookupBuyer;
     mapping(bytes32 => uint256) public _expiryTimes;
 
     /**
