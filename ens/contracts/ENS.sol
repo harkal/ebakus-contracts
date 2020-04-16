@@ -5,13 +5,6 @@ contract ENS {
   event Renew(bytes32 indexed label, uint256 expiresAt);
   event Transfer(bytes32 indexed label, address newOwner);
 
-  // struct Record {
-  //   bytes32 label;
-  //   address owner;
-  //   address buyer;
-  //   uint expiryTimestamp;
-  // }
-
   address private _owner;
   uint256 private _registrationAmount = 0.1 ether;
   uint256 private _registrationPeriod = 365 days;
@@ -125,13 +118,9 @@ contract ENS {
     require(newOwner != address(0), "ENS: New owner is the zero address");
     require(_lookupOwner[label] != address(0), "ENS: Label doesn't exist");
     require(msg.sender == _lookupOwner[label] || msg.sender == _lookupBuyer[label], "ENS: The label doesn't belong to you");
-
-    // TODO: remove this check? allowing the owner to transfer it, until someone boughts it
-    require(_expiryTimes[label] >= now, "ENS: Label is expired");
+    require(_expiryTimes[label] >= now, "ENS: Label is expired, please register it again");
 
     _lookupOwner[label] = newOwner;
-
-    // TODO: if expired we might want to release the entries in _lookupOwner and _expiryTimes
 
     emit Transfer(label, newOwner);
   }
