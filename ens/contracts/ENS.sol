@@ -136,6 +136,7 @@ contract ENS {
     emit Transfer(label, newOwner);
   }
 
+  // TODO: rename to getAddress?
   function owner(bytes32 label) external view returns (address) {
     return _lookupOwner[label];
   }
