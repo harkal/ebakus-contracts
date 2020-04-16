@@ -76,17 +76,17 @@ module.exports = async function(deployer, network, accounts) {
     }
 
     try {
-      const owner = await instance.owner(testLabel);
+      const address = await instance.getAddress(testLabel);
 
-      if (owner !== testOwner1) {
+      if (address !== testOwner1) {
         console.error(
-          "Owner retrieved doesn't match with the owner registered"
+          "Address retrieved doesn't match with the address registered"
         );
       }
 
-      console.info('Owner: %s', owner);
+      console.info('Address: %s', owner);
     } catch (err) {
-      console.error('Get owner err: ', err.message);
+      console.error('Get address err: ', err.message);
     }
 
     try {

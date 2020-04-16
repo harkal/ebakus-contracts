@@ -211,7 +211,7 @@ contract ENS {
      *
      * @param label label to get its address
      */
-    function owner(bytes32 label) external view returns (address) {
+    function getAddress(bytes32 label) external view returns (address) {
         return _lookupOwner[label];
     }
 
