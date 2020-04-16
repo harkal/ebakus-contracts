@@ -107,5 +107,13 @@ module.exports = async function(deployer, network, accounts) {
     } catch (err) {
       console.error('Label transfer err: ', err.message);
     }
+
+    try {
+      await instance.renew(testLabel);
+      console.error('Label has been renewed while it shouldn\'t');
+
+    } catch (err) {
+      console.info('Label failed to be renewed, as it should happen.', err.message);
+    }
   }
 };
