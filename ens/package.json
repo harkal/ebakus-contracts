@@ -24,6 +24,7 @@
   },
   "homepage": "https://www.ebakus.com",
   "devDependencies": {
+    "eth-ens-namehash": "^2.0.8",
     "truffle": "^5.1.17"
   }
 }

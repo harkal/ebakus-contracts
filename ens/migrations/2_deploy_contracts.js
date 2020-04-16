@@ -1,3 +1,5 @@
+const namehash = require('eth-ens-namehash');
+
 const ENS = artifacts.require('ENS');
 
 const ensContractJson = require('../build/contracts/ENS.json');
@@ -51,8 +53,7 @@ module.exports = async function(deployer, network, accounts) {
 
     console.log('\n----------------\nDeployment tests\n----------------\n');
 
-    const testLabel =
-      '0xde9b09fd7c5f901e23a3f19fecc54828e9c848539801e86591bd9801b019f84f';
+    const testLabel = namehash.hash('ebakus-ens.ebk');
     const testBuyer = accounts[0];
     const testOwner1 = '0x8F10D3A6283672EcfAeea0377d460BdEd489EC44';
     const testOwner2 = '0x6FDFD8Bf1A5310243519dC2e7B90916f6b4534ab';
