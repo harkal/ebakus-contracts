@@ -84,7 +84,7 @@ module.exports = async function(deployer, network, accounts) {
         );
       }
 
-      console.info('Address: %s', owner);
+      console.info('Address: %s', address);
     } catch (err) {
       console.error('Get address err: ', err.message);
     }

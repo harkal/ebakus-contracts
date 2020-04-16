@@ -38,6 +38,13 @@ contract ENS {
 
     constructor() public {
         _owner = msg.sender;
+
+        // TODO: set Label for this contract, system contract, ...?
+
+        // bytes32 currentContractLabel = "...";
+        // _lookupOwner[currentContractLabel] = _owner;
+        // _lookupBuyer[currentContractLabel] = _owner;
+        // _expiryTimes[currentContractLabel] = now + (365 * 20 * 1 days);
     }
 
     fallback() external {
@@ -112,21 +119,18 @@ contract ENS {
      * @param owner the address this label will point at
      */
     function register(bytes32 label, address owner) external payable {
-        require(
-            label.length > 0 && label.length <= 64,
-            "ENS: Label length is not correct"
-        );
         require(owner != address(0), "ENS: Owner is the zero address");
+        require(
+            owner != _owner || msg.sender == _owner,
+            "ENS: Only the contract owner can set a Label for this contract"
+        );
         require(
             _expiryTimes[label] < now,
             "ENS: Label belongs to somebody else"
         );
         require(
-            msg.value >= _registrationAmount,
-            "ENS: Not enough EBK for registering new label"
-        );
-        require(
-            msg.sender.balance >= _registrationAmount,
+            msg.value >= _registrationAmount &&
+                msg.sender.balance >= _registrationAmount,
             "ENS: Not enough EBK for registering new label"
         );
 
@@ -149,24 +153,17 @@ contract ENS {
      */
     function renew(bytes32 label) external payable {
         require(
-            label.length > 0 && label.length <= 64,
-            "ENS: Label length is not correct"
-        );
-        require(
             _expiryTimes[label] <= now + _renewWithinPeriod,
             "ENS: Renew is allowed 6 months before expiration"
         );
         require(
             msg.sender == _lookupOwner[label] ||
                 msg.sender == _lookupBuyer[label],
-            "ENS: The label doesn't belong to you"
+            "ENS: The label doesn't exist or doesn't belong to you"
         );
         require(
-            msg.value >= _registrationAmount,
-            "ENS: Not enough EBK for renewing the label"
-        );
-        require(
-            msg.sender.balance >= _registrationAmount,
+            msg.value >= _registrationAmount &&
+                msg.sender.balance >= _registrationAmount,
             "ENS: Not enough EBK for renewing the label"
         );
 
@@ -188,11 +185,14 @@ contract ENS {
      */
     function transfer(bytes32 label, address newOwner) external {
         require(newOwner != address(0), "ENS: New owner is the zero address");
-        require(_lookupOwner[label] != address(0), "ENS: Label doesn't exist");
+        require(
+            newOwner != _owner || msg.sender == _owner,
+            "ENS: Only the contract owner can set a Label for this contract"
+        );
         require(
             msg.sender == _lookupOwner[label] ||
                 msg.sender == _lookupBuyer[label],
-            "ENS: The label doesn't belong to you"
+            "ENS: The label doesn't exist or doesn't belong to you"
         );
         require(
             _expiryTimes[label] >= now,
@@ -203,8 +203,6 @@ contract ENS {
 
         emit Transfer(label, newOwner);
     }
-
-    // TODO: rename to getAddress?
 
     /**
      * @dev Get the address where a label points at.
