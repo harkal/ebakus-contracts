@@ -48,29 +48,34 @@ module.exports = async function(deployer, network, accounts) {
   const gas = await cmd.estimateGas();
   await cmd.send({ from: accounts[0], gas: gas });
 
+  // await instance.register(namehash.hash('ens'), ENS.address, {
+  //   from: accounts[0],
+  //   value: web3.utils.toWei('0.1', 'ether'),
+  // });
+
   // Test use for development
   if (network === 'development') {
 
     console.log('\n----------------\nDeployment tests\n----------------\n');
 
     const testLabel = namehash.hash('ebakus-ens.ebk');
-    const testBuyer = accounts[0];
-    const testOwner1 = '0x8F10D3A6283672EcfAeea0377d460BdEd489EC44';
-    const testOwner2 = '0x6FDFD8Bf1A5310243519dC2e7B90916f6b4534ab';
+    const testOwner = accounts[0];
+    const testTarget1 = '0x8F10D3A6283672EcfAeea0377d460BdEd489EC44';
+    const testTarget2 = '0x6FDFD8Bf1A5310243519dC2e7B90916f6b4534ab';
 
     try {
       const registrationAmount = await instance.getRegistrationAmount();
       console.log('RegistrationAmount: %d', registrationAmount)
 
-      const receipt = await instance.register(testLabel, testOwner1, {
-        from: testBuyer,
+      const receipt = await instance.register(testLabel, testTarget1, {
+        from: testOwner,
         value: registrationAmount,
         // value: web3.utils.toWei('0.2', 'ether'), // test excess amount
       });
       console.info(
         'Label got inserted: %s, %s',
         receipt.logs[0].args.label,
-        receipt.logs[0].args.owner
+        receipt.logs[0].args.target
       );
     } catch (err) {
       console.error('Label insertion err: ', err.message);
@@ -79,7 +84,7 @@ module.exports = async function(deployer, network, accounts) {
     try {
       const address = await instance.getAddress(testLabel);
 
-      if (address !== testOwner1) {
+      if (address !== testTarget1) {
         console.error(
           "Address retrieved doesn't match with the address registered"
         );
@@ -99,11 +104,11 @@ module.exports = async function(deployer, network, accounts) {
     }
 
     try {
-      const receipt = await instance.transfer(testLabel, testOwner2);
+      const receipt = await instance.transfer(testLabel, testTarget2);
       console.info(
         'Label got transfered: %s, %s',
         receipt.logs[0].args.label,
-        receipt.logs[0].args.newOwner
+        receipt.logs[0].args.newTarget
       );
     } catch (err) {
       console.error('Label transfer err: ', err.message);

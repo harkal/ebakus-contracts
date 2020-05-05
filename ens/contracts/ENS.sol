@@ -2,9 +2,9 @@ pragma solidity >=0.6.0 <0.7.0;
 
 
 contract ENS {
-    event NewOwner(bytes32 indexed label, address owner);
+    event NewOwner(bytes32 indexed label, address target);
     event Renew(bytes32 indexed label, uint256 expiresAt);
-    event Transfer(bytes32 indexed label, address newOwner);
+    event Transfer(bytes32 indexed label, address newTarget);
 
     address private _owner;
     uint256 private _registrationAmount = 0.1 ether;
@@ -13,8 +13,8 @@ contract ENS {
 
     mapping(address => bool) public _admins;
 
+    mapping(bytes32 => address) public _lookupTarget;
     mapping(bytes32 => address) public _lookupOwner;
-    mapping(bytes32 => address) public _lookupBuyer;
     mapping(bytes32 => uint256) public _expiryTimes;
 
     /**
@@ -38,13 +38,6 @@ contract ENS {
 
     constructor() public {
         _owner = msg.sender;
-
-        // TODO: set Label for this contract, system contract, ...?
-
-        // bytes32 currentContractLabel = "...";
-        // _lookupOwner[currentContractLabel] = _owner;
-        // _lookupBuyer[currentContractLabel] = _owner;
-        // _expiryTimes[currentContractLabel] = now + (365 * 20 * 1 days);
     }
 
     fallback() external {
@@ -116,12 +109,12 @@ contract ENS {
      * @dev Register a new label pointing to address.
      *
      * @param label label to be registered
-     * @param owner the address this label will point at
+     * @param target the address this label will point at
      */
-    function register(bytes32 label, address owner) external payable {
-        require(owner != address(0), "ENS: Owner is the zero address");
+    function register(bytes32 label, address target) external payable {
+        require(target != address(0), "ENS: Target is the zero address");
         require(
-            owner != _owner || msg.sender == _owner,
+            target != _owner || msg.sender == _owner,
             "ENS: Only the contract owner can set a Label for this contract"
         );
         require(
@@ -134,8 +127,8 @@ contract ENS {
             "ENS: Not enough EBK for registering new label"
         );
 
-        _lookupOwner[label] = owner;
-        _lookupBuyer[label] = msg.sender;
+        _lookupTarget[label] = target;
+        _lookupOwner[label] = msg.sender;
         _expiryTimes[label] = now + _registrationPeriod;
 
         // return back any excess amount
@@ -143,7 +136,7 @@ contract ENS {
             msg.sender.transfer(msg.value - _registrationAmount);
         }
 
-        emit NewOwner(label, owner);
+        emit NewOwner(label, target);
     }
 
     /**
@@ -157,8 +150,8 @@ contract ENS {
             "ENS: Renew is allowed 6 months before expiration"
         );
         require(
-            msg.sender == _lookupOwner[label] ||
-                msg.sender == _lookupBuyer[label],
+            msg.sender == _lookupTarget[label] ||
+                msg.sender == _lookupOwner[label],
             "ENS: The label doesn't exist or doesn't belong to you"
         );
         require(
@@ -181,17 +174,17 @@ contract ENS {
      * @dev Transfer a label to a new address.
      *
      * @param label label to be transfered
-     * @param newOwner the new address this label will point at
+     * @param newTarget the new address this label will point at
      */
-    function transfer(bytes32 label, address newOwner) external {
-        require(newOwner != address(0), "ENS: New owner is the zero address");
+    function transfer(bytes32 label, address newTarget) external {
+        require(newTarget != address(0), "ENS: New owner is the zero address");
         require(
-            newOwner != _owner || msg.sender == _owner,
+            newTarget != _owner || msg.sender == _owner,
             "ENS: Only the contract owner can set a Label for this contract"
         );
         require(
-            msg.sender == _lookupOwner[label] ||
-                msg.sender == _lookupBuyer[label],
+            msg.sender == _lookupTarget[label] ||
+                msg.sender == _lookupOwner[label],
             "ENS: The label doesn't exist or doesn't belong to you"
         );
         require(
@@ -199,9 +192,9 @@ contract ENS {
             "ENS: Label is expired, please register it again"
         );
 
-        _lookupOwner[label] = newOwner;
+        _lookupTarget[label] = newTarget;
 
-        emit Transfer(label, newOwner);
+        emit Transfer(label, newTarget);
     }
 
     /**
@@ -210,7 +203,7 @@ contract ENS {
      * @param label label to get its address
      */
     function getAddress(bytes32 label) external view returns (address) {
-        return _lookupOwner[label];
+        return _lookupTarget[label];
     }
 
     /**
