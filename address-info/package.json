@@ -1,7 +1,7 @@
 {
-  "name": "ebakus-contracts-witness-info",
+  "name": "ebakus-contracts-address-info",
   "version": "1.0.0",
-  "description": "Ebakus contract for handling witness info",
+  "description": "Ebakus contract for handling address info",
   "scripts": {
     "compile": "truffle compile",
     "migrate": "truffle migrate",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ebakus/ebakus-contracts/witness-info"
+    "url": "https://github.com/ebakus/ebakus-contracts/address-info"
   },
   "keywords": [
     "solidity",
