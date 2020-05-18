@@ -63,7 +63,7 @@ module.exports = async function (deployer, network, accounts) {
     try {
       const receipt = await instance.set(accounts[0], testInfoJSONString);
       console.info(
-        'AddressInfo got inserted: %s, %s',
+        'AddressInfo got inserted: %s, \n%s\n',
         receipt.logs[0].args.Id,
         receipt.logs[0].args.Info
       );
@@ -80,26 +80,30 @@ module.exports = async function (deployer, network, accounts) {
         );
       }
 
-      console.info('Get info: %s', info);
+      console.info('Get info for address %s: \n%s\n', accounts[0], info);
     } catch (err) {
       console.error('Get info err: ', err);
     }
 
     try {
       const receipt = await instance.remove(accounts[0]);
-      console.info('Info deleted: %s', receipt.logs[0].args.Id);
+      console.info('Info deleted: %s\n', receipt.logs[0].args.Id);
     } catch (err) {
       console.error('Info deletion err: ', err);
     }
 
     try {
       const info = await instance.get(accounts[0]);
-      console.error(
-        "Hmmm, we shouldn't get back any data as they have been removed",
-        info
-      );
+      if (info !== '') {
+        console.error(
+          "Hmmm, we shouldn't get back any data as they have been removed",
+          info
+        );
+      } else {
+        console.info('Great! No record found!');
+      }
     } catch (err) {
-      console.info('Great! No record found!');
+      console.error('Get info err: ', err);
     }
   }
 };
