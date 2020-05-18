@@ -6,6 +6,9 @@ contract AddressInfo {
 
     mapping(address => string) private _abis;
 
+    fallback() external {
+        revert("You are not allowed to call undefined functions");
+    }
 
     /**
      * @notice Set info for address
