@@ -2378,6 +2378,32 @@
     "version": "0.6.0+commit.26b70077.Emscripten.clang"
   },
   "networks": {
+    "7": {
+      "events": {
+        "0x69087606d698b9a503176191af0e6930dc893f51e06d947eb87d3b55cf7d787b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "Id",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "Info",
+              "type": "string"
+            }
+          ],
+          "name": "UpdatedAddressInfo",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xAd170Ce8Ad1Ea5EaDC1d5658961bC580Ff2A4b2F",
+      "transactionHash": "0xa95b900ffec66085a85f9728831b534de51e41076b703e5f247c21856c70e785"
+    },
     "1337": {
       "events": {
         "0x69087606d698b9a503176191af0e6930dc893f51e06d947eb87d3b55cf7d787b": {
@@ -2406,7 +2432,7 @@
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-05-18T10:27:17.998Z",
+  "updatedAt": "2020-05-18T10:36:34.598Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {
