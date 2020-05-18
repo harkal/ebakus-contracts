@@ -20,7 +20,10 @@ contract AddressInfo {
             msg.sender == account,
             "Only the owner of the address can store info."
         );
-        require(bytes(info).length <= 104857, "Reached maximum size (0.1MB) for stored information");
+        require(
+            bytes(info).length <= 1024,
+            "Reached maximum size (1KB) of stored information"
+        );
 
         _abis[account] = info;
 
